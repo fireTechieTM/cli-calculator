@@ -27,26 +27,34 @@ def simplify(operands, operation):
             i += 1
     return operands
 
-def solve(equation, position, in_parentheses):
-    #something
 
+global_position = 0
+def solve(equation, position=0): 
     operands = []
-    i = 0
 
-    while i < len(equation):
-        if equation[i] in accepted_operations:
-            operands.append(equation[i])
-        elif equation[i] in accepted_quantities:
-            current = equation[i]
-            while i + 1 < len(equation) and equation[i + 1] in accepted_quantities:
-                i += 1
-                current += equation[i]
+    while position < len(equation):
+        if equation[position] == '(':
+            parentheses_solution = solve(equation, position + 1)
+            operands.append(parentheses_solution[0])
+            position = parentheses_solution[1]
+        elif equation[position] == ')':
+            for operation in accepted_operations:
+                operands = simplify(operands, operation)
+            return operands[0], position
+
+        elif equation[position] in accepted_operations:
+            operands.append(equation[position])
+        elif equation[position] in accepted_quantities:
+            current = equation[position]
+            while position + 1 < len(equation) and equation[position + 1] in accepted_quantities:
+                position += 1
+                current += equation[position]
             operands.append(int(current))
-        i += 1
+        position += 1
 
     for operation in accepted_operations:
         operands = simplify(operands, operation)
-        
-    return operands
 
-print(solve(equation, 0, False))
+    return operands[0]
+
+print(solve(equation))
