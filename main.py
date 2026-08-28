@@ -10,17 +10,19 @@ What do you need calculated? (whitespace is acceptable)\n
 #4 * 3 * 12
 #First, we must split it up recursively
 
-accepted_operations = ['*', '/', '+', '-']
+accepted_operations = ['*', '/', '+', '-'] #must be in order of operations
 accepted_quantities = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0']
 
-def simplify(operands):
-    # _operands = []
+def simplify(operands, operation):
     i = 0
     while i < len(operands) - 1:
-        if operands[i + 1] == '*':
-            operands[i] *= operands[i + 2]
+        if operands[i + 1] == operation:
+            if operation == '*': operands[i] *= operands[i + 2]
+            if operation == '/': operands[i] /= operands[i + 2]
+            if operation == '+': operands[i] += operands[i + 2]
+            if operation == '-': operands[i] -= operands[i + 2]
             operands.remove(operands[i + 2])
-            operands.remove('*')
+            operands.remove(operation)
         else:
             i += 1
     return operands
@@ -35,14 +37,16 @@ def solve(equation, position, in_parentheses):
         if equation[i] in accepted_operations:
             operands.append(equation[i])
         elif equation[i] in accepted_quantities:
-            current = ""
-            while i < len(equation) and equation[i] in accepted_quantities: 
-                current += equation[i]
+            current = equation[i]
+            while i + 1 < len(equation) and equation[i + 1] in accepted_quantities:
                 i += 1
+                current += equation[i]
             operands.append(int(current))
         i += 1
 
-    return simplify(operands)
-
+    for operation in accepted_operations:
+        operands = simplify(operands, operation)
+        
+    return operands
 
 print(solve(equation, 0, False))
